@@ -9,9 +9,12 @@
   body { margin:0; background:#111; font-family:Roboto,sans-serif; color:var(--primary-text-color); }
   .app-bar { height:56px; display:flex; align-items:center; padding:0 16px; background:#1c1c1c; }
   #view { height:calc(100vh - 56px); }
+  html.bare { --header-height:0px; }
+  html.bare .app-bar { display:none; }
+  html.bare #view { height:100vh; }
   ha-card { display:block; background:var(--card-background-color); color:var(--primary-text-color); }
 </style></head>
-<body><div class="app-bar">TV</div><div id="view"></div>
+<body><script>if (location.search.includes("bare")) document.documentElement.classList.add("bare");</script><div class="app-bar">TV</div><div id="view"></div>
 <script>
   class HaIcon extends HTMLElement {
     static get observedAttributes() { return ['icon']; }
