@@ -3,7 +3,16 @@
 Lovelace card that turns a phone into a remote for an LG webOS TV, built on the core
 `webostv` integration. Italian UI.
 
-<p align="center"><img src="docs/screenshot.png" alt="LG TV Remote Card" width="320"></p>
+<p align="center">
+  <img src="docs/screenshot.png" alt="D-pad with the now-playing strip" width="240">
+  <img src="docs/touchpad.png" alt="Touchpad with scroll strip" width="240">
+  <img src="docs/apps.png" alt="Apps tab" width="240">
+</p>
+<p align="center">
+  <img src="docs/channels.png" alt="Channels sheet with programmes" width="240">
+  <img src="docs/numpad.png" alt="Channel number pad" width="240">
+  <img src="docs/off.png" alt="TV off state" width="240">
+</p>
 
 ## Features
 

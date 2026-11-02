@@ -32,7 +32,7 @@
 </script>
 <script type="module">
   import '../src/lg-tv-remote-card.js';
-  const [scenario = 'on', tab] = location.hash.slice(1).split(',');
+  const [scenario = 'on', tab, open] = location.hash.slice(1).split(',');
   const sources = ['Amazon Alexa','Apple TV','Apps','Browser Web','Canali TV','Copilot','Developer Mode','Disney+','FlexIt','HDMI 1','HDMI 2','HDMI 3','HDMI 4','Memory Care','Netflix','OfficeViewer','Prime Video','RaiPlay','Sport','Stremio','YouTube'];
   const states = {
     on: { state: 'playing', attributes: { friendly_name: 'LG Tv', source: 'Netflix', app_id: 'netflix', media_title: '', volume_level: 0.13, is_volume_muted: false, source_list: sources } },
@@ -87,4 +87,5 @@
   window.card = card;
   window.hass = hass;
   if (tab) card._goToTab(tab);
+  if (open) setTimeout(() => card._openSheet(open), 300);
 </script></body></html>
