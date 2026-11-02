@@ -1,0 +1,87 @@
+<!doctype html>
+<!-- Visual test page: serve the project root (python3 -m http.server) and open /test/harness.html#<scenario>[,<tab>]
+     Scenarios: on (Netflix), live (Rai 1), home (launcher), off, unavailable. Mimics a Home Assistant dark theme with a stub for <ha-icon>. -->
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
+<style>
+  :root { --primary-color:#03a9f4; --text-primary-color:#fff; --primary-text-color:#e1e1e1; --secondary-text-color:#9b9b9b;
+          --secondary-background-color:#2b2b2b; --card-background-color:#1c1c1c; --divider-color:#444; --error-color:#db4437; }
+  body { margin:0; background:#111; font-family:Roboto,sans-serif; color:var(--primary-text-color); }
+  .app-bar { height:56px; display:flex; align-items:center; padding:0 16px; background:#1c1c1c; }
+  #view { height:calc(100vh - 56px); }
+  ha-card { display:block; background:var(--card-background-color); color:var(--primary-text-color); }
+</style></head>
+<body><div class="app-bar">TV</div><div id="view"></div>
+<script>
+  class HaIcon extends HTMLElement {
+    static get observedAttributes() { return ['icon']; }
+    connectedCallback() { this.render(); }
+    attributeChangedCallback() { this.render(); }
+    render() {
+      const name = (this.getAttribute('icon') || '').replace('mdi:', '');
+      const size = 'var(--mdc-icon-size, 24px)';
+      const root = this.shadowRoot || this.attachShadow({ mode: 'open' });
+      root.innerHTML = `<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
+        <i class="mdi mdi-${name}" style="font-size:${size};line-height:1;display:block"></i>`;
+    }
+  }
+  customElements.define('ha-icon', HaIcon);
+</script>
+<script type="module">
+  import '../src/lg-tv-remote-card.js';
+  const [scenario = 'on', tab] = location.hash.slice(1).split(',');
+  const sources = ['Amazon Alexa','Apple TV','Apps','Browser Web','Canali TV','Copilot','Developer Mode','Disney+','FlexIt','HDMI 1','HDMI 2','HDMI 3','HDMI 4','Memory Care','Netflix','OfficeViewer','Prime Video','RaiPlay','Sport','Stremio','YouTube'];
+  const states = {
+    on: { state: 'playing', attributes: { friendly_name: 'LG Tv', source: 'Netflix', app_id: 'netflix', media_title: '', volume_level: 0.13, is_volume_muted: false, source_list: sources } },
+    home: { state: 'on', attributes: { friendly_name: 'LG Tv', app_id: 'com.webos.app.home', media_title: '', volume_level: 0.13, is_volume_muted: false, source_list: sources } },
+    live: { state: 'playing', attributes: { friendly_name: 'LG Tv', source: 'Canali TV', app_id: 'com.webos.app.livetv', media_title: 'Rai 1', volume_level: 0.13, is_volume_muted: false, source_list: sources } },
+    off: { state: 'off', attributes: { friendly_name: 'LG Tv' } },
+    unavailable: { state: 'unavailable', attributes: { friendly_name: 'LG Tv' } },
+  };
+  window.calls = [];
+  window.failNext = false;
+  const hass = {
+    services: { lgtv_pointer: { move: {}, click: {}, scroll: {}, watch_keyboard: {}, app_icons: {} } },
+    connection: { subscribeEvents: async (callback) => { window.fireKeyboard = (data) => callback({ data }); return () => {}; } },
+    states: { 'media_player.lg_tv': states[scenario] },
+    callService: async (domain, service, data) => {
+      window.calls.push(`${domain}.${service} ${JSON.stringify(data)}`);
+      if (window.failNext) { window.failNext = false; throw new Error('boom'); }
+    },
+  };
+  // fake TV data: 40 channels, a programme list that always covers "now"
+  const names = ['Rai 1','Rai 2','Rai 3','Rete 4','Canale 5','Italia 1','La7','TV8','Nove','Rai 4','Iris','Rai 5','Rai Movie','Rai Premium','Mediaset Extra','Cielo'];
+  const rawChannels = names.map((channelName, i) => ({ channelId: `id${i + 1}`, channelNumber: String(i + 1), channelName, TV: true, Radio: false, Invisible: false }));
+  const pad = (n) => String(n).padStart(2, '0');
+  const tvTime = (d) => [d.getFullYear(), pad(d.getMonth() + 1), pad(d.getDate()), pad(d.getHours()), pad(d.getMinutes()), '00'].join(',');
+  const programList = (seed) => {
+    const now = new Date(); const start = new Date(now.getTime() - (10 + seed * 7 % 40) * 60000); const out = [];
+    for (let i = 0; i < 3; i++) { const end = new Date(start.getTime() + 55 * 60000); out.push({ programName: ['TG1', 'Che tempo fa', 'Uno Mattina', 'Le Iene', 'Omnibus', 'MasterChef'][(seed + i) % 6], localStartTime: tvTime(start), localEndTime: tvTime(end) }); start.setTime(end.getTime()); }
+    return out;
+  };
+  hass.callWS = async (message) => {
+    window.calls.push(`ws ${message.domain}.${message.service} ${message.service_data.command ?? ''} ${JSON.stringify(message.service_data.payload ?? {})}`);
+    const entity = message.service_data.entity_id; const command = message.service_data.command;
+    if (message.service === 'app_icons') return { response: { icons: {} } };
+    if (command === 'tv/getChannelList') return { response: { [entity]: { channelList: rawChannels } } };
+    if (command === 'tv/getChannelProgramInfo') {
+      const id = message.service_data.payload?.channelId ?? `id${window.currentChannel ?? 1}`;
+      const index = Number(id.replace('id', '')) - 1;
+      return { response: { [entity]: { channel: { ...rawChannels[index], channelNumber: String(index + 1), channelName: rawChannels[index].channelName }, programList: programList(index) } } };
+    }
+    return { response: { [entity]: {} } };
+  };
+  const baseCall = hass.callService;
+  hass.callService = async (domain, service, data) => {
+    if (service === 'play_media') { window.currentChannel = Number(data.media_content_id); hass.states['media_player.lg_tv'] = { state: 'playing', attributes: { ...hass.states['media_player.lg_tv'].attributes, source: 'Canali TV', app_id: 'com.webos.app.livetv', media_title: names[window.currentChannel - 1] } }; card.hass = { ...hass }; }
+    return baseCall(domain, service, data);
+  };
+  const card = document.createElement('lg-tv-remote-card');
+  card.setConfig({ name: 'TV Salotto' });
+  card.style.height = '100%';
+  document.getElementById('view').append(card);
+  card.hass = hass;
+  window.card = card;
+  window.hass = hass;
+  if (tab) card._goToTab(tab);
+</script></body></html>

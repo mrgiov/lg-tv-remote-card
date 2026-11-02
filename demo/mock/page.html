@@ -1,0 +1,79 @@
+<title>Prova Telecomando LG</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+  /* Layout: the real card in a phone-sized frame next to a control panel for the mock TV; stacks on narrow screens */
+  :root {
+    --bg:#eceff3; --fg:#18202a; --muted:#59667a; --panel:#ffffff; --line:#d3d9e1; --accent:#0b6bb5; --bad:#b3261e; --good:#1f7a4d;
+    --font:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#0e1217; --fg:#e6ebf1; --muted:#97a3b2; --panel:#171e27; --line:#2a3441; --accent:#5db3f0; --bad:#ff8a80; --good:#7bd8a4; color-scheme:dark; } }
+  :root[data-theme="dark"] { --bg:#0e1217; --fg:#e6ebf1; --muted:#97a3b2; --panel:#171e27; --line:#2a3441; --accent:#5db3f0; --bad:#ff8a80; --good:#7bd8a4; color-scheme:dark; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--fg); font-family:var(--font); font-size:14px; line-height:1.5;
+         padding-block:20px; padding-left:max(16px, env(safe-area-inset-left,0px)); padding-right:max(16px, env(safe-area-inset-right,0px)); }
+  .wrap { max-width:1000px; margin:0 auto; }
+  h1 { margin:0 0 4px; font-size:21px; text-wrap:balance; }
+  .lead { margin:0 0 18px; color:var(--muted); max-width:66ch; }
+  .layout { display:flex; flex-wrap:wrap; gap:24px; align-items:flex-start; justify-content:center; }
+  .phone { flex:0 0 auto; width:360px; max-width:100%; height:720px; max-height:calc(100dvh - 32px); min-height:620px; border-radius:30px; overflow:hidden; border:1px solid var(--line); background:#0b0e14; }
+  .side { flex:1 1 340px; min-width:0; max-width:560px; display:flex; flex-direction:column; gap:12px; }
+  .box { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:12px 14px; }
+  .box h2 { margin:0 0 8px; font-size:12px; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); font-weight:600; }
+  .row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  button.opt { min-height:40px; padding:0 14px; border-radius:10px; border:1px solid var(--line); background:transparent; color:var(--fg); font:inherit; cursor:pointer; }
+  button.opt[aria-pressed="true"] { background:var(--accent); border-color:var(--accent); color:#fff; }
+  button.opt:focus-visible, select:focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
+  select { min-height:40px; border-radius:10px; border:1px solid var(--line); background:var(--panel); color:var(--fg); font:inherit; padding:0 8px; }
+  label.field { display:flex; gap:8px; align-items:center; color:var(--muted); font-size:13px; }
+  .state { display:grid; grid-template-columns:auto 1fr; gap:2px 12px; font-size:13px; } .state dt { color:var(--muted); } .state dd { margin:0; }
+  #log { list-style:none; margin:0; padding:0; max-height:230px; overflow:auto; font:12px var(--mono); }
+  #log li { padding:3px 0; border-bottom:1px solid var(--line); color:var(--muted); word-break:break-word; }
+  #log li.call { color:var(--fg); } #log li.fail { color:var(--bad); } #log li.haptic { color:var(--accent); } #log li.event { color:var(--good); }
+  .hint { margin:8px 0 0; color:var(--muted); font-size:12px; }
+</style>
+<div class="wrap">
+  <h1>Prova Telecomando LG</h1>
+  <p class="lead">La vera card del telecomando, collegata a una TV finta. Usala come sul telefono, poi fai fare alla TV cose che di solito capitano da sole: spegnersi, aprire un campo di testo, cambiare canale. Nessuna TV vera viene toccata.</p>
+  <div class="layout">
+    <div class="phone" id="card-slot"></div>
+    <div class="side">
+      <section class="box">
+        <h2>Cosa fa la TV</h2>
+        <div class="row">
+          <button class="opt" data-power="on">Accesa</button>
+          <button class="opt" data-power="off">In standby</button>
+          <button class="opt" data-power="unavailable">Non raggiungibile</button>
+        </div>
+        <div class="row" style="margin-top:8px">
+          <button class="opt" id="field">Apri un campo di testo</button>
+          <button class="opt" id="home">Torna alla Home</button>
+          <button class="opt" id="zap">Cambia canale da solo</button>
+          <button class="opt" id="app">Apri Netflix</button>
+        </div>
+        <p class="hint">Un campo di testo aperto sulla TV fa salire da solo la tastiera nella card.</p>
+      </section>
+      <section class="box">
+        <h2>Cosa va storto</h2>
+        <div class="row">
+          <button class="opt" id="fail" aria-pressed="false">Il prossimo comando fallisce</button>
+          <label class="field">Accensione <select id="wake"><option value="1000">1 s</option><option value="4000" selected>4 s</option><option value="10000">10 s</option></select></label>
+          <label class="field">Risposta <select id="latency"><option value="0" selected>subito</option><option value="400">0,4 s</option><option value="1500">1,5 s</option></select></label>
+        </div>
+      </section>
+      <section class="box">
+        <h2>Vibrazione</h2>
+        <div class="row"><button class="opt" id="external" aria-pressed="true">Come nell'app</button><span id="external-label" style="color:var(--muted)"></span></div>
+        <p class="hint">Le vibrazioni non si sentono su questa pagina: qui compaiono nel registro.</p>
+      </section>
+      <section class="box">
+        <h2>Stato della TV finta</h2>
+        <dl class="state"><dt>Ora</dt><dd id="tv-now"></dd><dt>Audio</dt><dd id="tv-volume"></dd><dt>Testo</dt><dd id="tv-text"></dd></dl>
+      </section>
+      <section class="box">
+        <h2>Registro</h2>
+        <div class="row" style="margin-bottom:6px"><button class="opt" id="clear">Svuota</button></div>
+        <ol id="log"></ol>
+      </section>
+    </div>
+  </div>
+</div>
