@@ -1,5 +1,7 @@
 # lg-tv-remote-card
 
+**English** · [Italiano](README.it.md)
+
 Lovelace card that turns a phone into a remote for an LG webOS TV, built on the core
 `webostv` integration. Italian UI.
 
@@ -100,7 +102,7 @@ The optional [lgtv-pointer](https://github.com/mrgiov/lgtv-pointer) integration 
 ```bash
 npm test                                   # unit tests
 npm run build                              # bundles src/ into dist/lg-tv-remote-card.js (the file HACS serves; commit it)
-python3 test/serve.py                      # no-cache server; open localhost:8767/test/harness.html#on (also #off, #unavailable, #on,apps)
+python3 test/serve.py                      # no-cache server; open localhost:8767/test/harness.html#on (also #off, #unavailable, #on,apps, #live,dpad,channels)
 ./deploy.sh                                # prints the resource URL
 ```
 
