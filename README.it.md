@@ -5,6 +5,10 @@
 Card Lovelace che trasforma lo smartphone nel telecomando di una TV LG webOS, basata sull'integrazione
 `webostv` di Home Assistant. Interfaccia in italiano.
 
+<p align="center"><img src="docs/demo.gif" alt="La card in uso: schede, elenco canali, tastierino, volume, TV spenta" width="300"></p>
+
+**[Provala nel browser](https://mrgiov.github.io/lg-tv-remote-card/)**: la card vera su una TV finta, senza installare niente.
+
 <p align="center">
   <img src="docs/screenshot.png" alt="Frecce con la barra «in onda»" width="240">
   <img src="docs/touchpad.png" alt="Touchpad con la striscia di scorrimento" width="240">
@@ -47,7 +51,7 @@ test/support/dom.mjs      configura jsdom e monta la card vera sulla TV finta
 test/harness.html         pagina di prova visiva con una TV finta (vedi sotto)
 test/serve.py             server statico senza cache per la pagina di prova
 deploy.sh                 pubblica in /config/www come versione immutabile
-demo/mock/                `node demo/mock/build.mjs` crea una pagina HTML: la card vera sulla TV finta, con un pannello per spegnere la TV, aprire un campo di testo, far fallire un comando
+demo/mock/                `node demo/mock/build.mjs` crea docs/index.html (la pagina dietro il link qui sopra): la card vera sulla TV finta, con un pannello per spegnere la TV, aprire un campo di testo, far fallire un comando
 ```
 
 ## Configurazione della card

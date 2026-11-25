@@ -7,7 +7,7 @@ const tv = new MockTv({ power: 'on', wakeDelayMs: 4000, sleepDelayMs: 2500, late
 let external = true; // pretend to be inside the Home Assistant app (native haptics) or a plain browser (vibration)
 
 const card = document.createElement('lg-tv-remote-card');
-card.setConfig({ type: 'custom:lg-tv-remote-card', entity: tv.entity, name: 'TV Salone' });
+card.setConfig({ type: 'custom:lg-tv-remote-card', entity: tv.entity, name: 'TV Salotto' });
 $('card-slot').append(card);
 
 const push = () => { card.hass = tv.hass({ external }); renderPanel(); };

@@ -5,6 +5,10 @@
 Lovelace card that turns a phone into a remote for an LG webOS TV, built on the core
 `webostv` integration. Italian UI.
 
+<p align="center"><img src="docs/demo.gif" alt="The card in use: tabs, channel list, number pad, volume, TV off" width="300"></p>
+
+**[Try it in your browser](https://mrgiov.github.io/lg-tv-remote-card/)**: the real card on a fake TV, nothing to install.
+
 <p align="center">
   <img src="docs/screenshot.png" alt="D-pad with the now-playing strip" width="240">
   <img src="docs/touchpad.png" alt="Touchpad with scroll strip" width="240">
@@ -47,7 +51,7 @@ test/support/dom.mjs      jsdom setup that mounts the real card on the mock TV
 test/harness.html         visual test page with a fake TV (see below)
 test/serve.py             static server without caching for the harness
 deploy.sh                 publishes to /config/www as an immutable version
-demo/mock/                `node demo/mock/build.mjs` builds one HTML page: the real card on the mock TV, with a panel to switch the TV off, open a text field, make a command fail
+demo/mock/                `node demo/mock/build.mjs` builds docs/index.html (the page behind the link above): the real card on the mock TV, with a panel to switch the TV off, open a text field, make a command fail
 ```
 
 ## Card configuration

@@ -16,5 +16,8 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mrgiov/lg-tv-remote-card.git"
+  },
+  "engines": {
+    "node": ">=22.22"
   }
 }

@@ -8,8 +8,10 @@ import { fileURLToPath } from 'node:url';
 const here = dirname(fileURLToPath(import.meta.url));
 const cache = join(here, '..', '.cache');
 const dist = join(here, 'dist');
+const docs = join(here, '..', '..', 'docs'); // GitHub Pages serves docs/index.html
 mkdirSync(cache, { recursive: true });
 mkdirSync(dist, { recursive: true });
+mkdirSync(docs, { recursive: true });
 
 const MDI = 'https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47';
 for (const [file, url] of [['mdi.css', `${MDI}/css/materialdesignicons.min.css`], ['mdi.woff2', `${MDI}/fonts/materialdesignicons-webfont.woff2`]]) {
@@ -42,5 +44,9 @@ const html = `${page}<style>@font-face{font-family:'Material Design Icons';src:u
 <script>${iconStub}</script>
 <script>${bundle}</script>
 `;
-writeFileSync(join(dist, 'index.html'), html);
-console.log(`demo/mock/dist/index.html  ${(html.length / 1024).toFixed(0)} KB`);
+// docs/index.html is a complete document (it needs the viewport tag to be responsive on a phone);
+// artifact.html is the bare fragment that the Claude artifact wrapper expects.
+const head = '<!doctype html><html lang="it"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">';
+writeFileSync(join(docs, 'index.html'), head + html);
+writeFileSync(join(dist, 'artifact.html'), html);
+console.log(`docs/index.html  ${((head.length + html.length) / 1024).toFixed(0)} KB`);
