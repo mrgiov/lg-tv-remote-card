@@ -79,8 +79,7 @@ Without the component the app tiles keep a coloured letter.
 ## Pointer support (optional)
 
 `webostv` only exposes remote buttons. The touchpad pointer, the keyboard auto-open and the app icons need the small
-companion integration [lgtv-pointer](https://github.com/mrgiov/lgtv-pointer), installable with HACS (category
-Integration). Without it the touchpad falls back to swipe-as-arrows and tap-as-OK.
+companion integration [lgtv-pointer](https://github.com/mrgiov/lgtv-pointer), installable with HACS. Without it the touchpad falls back to swipe-as-arrows and tap-as-OK.
 
 ## Auto-opening the keyboard sheet
 
@@ -91,11 +90,12 @@ sends the subscription without waiting for a first reply. On iOS the phone keybo
 
 ## Install with HACS
 
-1. HACS → ⋮ → Custom repositories → add this repository, category **Dashboard**.
-2. Install **LG TV Remote Card**; HACS registers the resource itself.
-3. Add the card: `type: custom:lg-tv-remote-card`.
+1. In HACS (the Marketplace on recent Home Assistant releases) search for **LG TV Remote Card** and install it. HACS registers the dashboard resource itself.
+2. Add the card: `type: custom:lg-tv-remote-card`.
 
-The optional [lgtv-pointer](https://github.com/mrgiov/lgtv-pointer) integration (touchpad pointer, keyboard auto-open, app icons) is installed separately, also with HACS.
+If it does not show up in the search yet, add it by hand: ⋮ → Custom repositories → `mrgiov/lg-tv-remote-card`, category **Dashboard**.
+
+The optional [lgtv-pointer](https://github.com/mrgiov/lgtv-pointer) integration (touchpad pointer, keyboard auto-open, app icons) is installed separately: until it appears in the HACS search, add it as a custom repository (category **Integration**).
 
 ## Develop and deploy
 

@@ -80,7 +80,7 @@ Senza il componente le app restano una lettera colorata.
 
 `webostv` espone solo i tasti del telecomando. Il puntatore del touchpad, l'apertura automatica della tastiera e le
 icone delle app richiedono la piccola integrazione [lgtv-pointer](https://github.com/mrgiov/lgtv-pointer),
-installabile con HACS (categoria Integrazione). Senza, il touchpad ripiega su swipe = frecce e tocco = OK.
+installabile con HACS. Senza, il touchpad ripiega su swipe = frecce e tocco = OK.
 
 ## Apertura automatica del foglio tastiera
 
@@ -91,11 +91,12 @@ invia l'iscrizione senza aspettare una prima risposta. Su iOS la tastiera del te
 
 ## Installazione con HACS
 
-1. HACS → ⋮ → Repository personalizzati → aggiungi questo repository, categoria **Dashboard**.
-2. Installa **LG TV Remote Card**; HACS registra la risorsa da solo.
-3. Aggiungi la card: `type: custom:lg-tv-remote-card`.
+1. In HACS (il Marketplace nelle versioni recenti di Home Assistant) cerca **LG TV Remote Card** e installala. HACS registra da solo la risorsa della dashboard.
+2. Aggiungi la card: `type: custom:lg-tv-remote-card`.
 
-L'integrazione facoltativa [lgtv-pointer](https://github.com/mrgiov/lgtv-pointer) (puntatore del touchpad, tastiera automatica, icone delle app) si installa a parte, sempre con HACS.
+Se non compare ancora nella ricerca, aggiungila a mano: ⋮ → Repository personalizzati → `mrgiov/lg-tv-remote-card`, categoria **Dashboard**.
+
+L'integrazione facoltativa [lgtv-pointer](https://github.com/mrgiov/lgtv-pointer) (puntatore del touchpad, tastiera automatica, icone delle app) si installa a parte: finché non compare nella ricerca di HACS, aggiungila come repository personalizzato (categoria **Integrazione**).
 
 ## Sviluppo e pubblicazione
 
