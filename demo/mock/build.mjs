@@ -46,7 +46,15 @@ const html = `${page}<style>@font-face{font-family:'Material Design Icons';src:u
 `;
 // docs/index.html is a complete document (it needs the viewport tag to be responsive on a phone);
 // artifact.html is the bare fragment that the Claude artifact wrapper expects.
-const head = '<!doctype html><html lang="it"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">';
-writeFileSync(join(docs, 'index.html'), head + html);
+const url = 'https://mrgiov.github.io/lg-tv-remote-card/';
+const title = 'LG TV Remote Card: online demo / telecomando LG per Home Assistant';
+const about = 'Try the Home Assistant Lovelace card for LG webOS TVs in your browser: magic-remote touchpad, channels, apps, keyboard. Provala nel browser: telecomando LG webOS per Home Assistant.';
+const head = `<!doctype html><html lang="it"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="${about}"><link rel="canonical" href="${url}">
+<meta property="og:type" content="website"><meta property="og:title" content="${title}"><meta property="og:description" content="${about}">
+<meta property="og:url" content="${url}"><meta property="og:image" content="${url}screenshot.png">
+<meta name="twitter:card" content="summary_large_image">`;
+// the page's own <title> (kept short for the artifact) is replaced by the search-friendly one
+writeFileSync(join(docs, 'index.html'), head + html.replace(/<title>[^<]*<\/title>/, `<title>${title}</title>`));
 writeFileSync(join(dist, 'artifact.html'), html);
 console.log(`docs/index.html  ${((head.length + html.length) / 1024).toFixed(0)} KB`);

@@ -2,8 +2,9 @@
 
 **English** · [Italiano](README.it.md)
 
-Lovelace card that turns a phone into a remote for an LG webOS TV, built on the core
-`webostv` integration. Italian UI.
+Lovelace card that turns a phone into a remote for an LG webOS TV (OLED, QNED, NanoCell), built on the core
+`webostv` integration of Home Assistant. It has a magic-remote style touchpad, channel list with programmes,
+number pad, app launcher and keyboard. Italian UI.
 
 <p align="center"><img src="docs/demo.gif" alt="The card in use: tabs, channel list, number pad, volume, TV off" width="300"></p>
 
@@ -19,6 +20,13 @@ Lovelace card that turns a phone into a remote for an LG webOS TV, built on the 
   <img src="docs/numpad.png" alt="Channel number pad" width="240">
   <img src="docs/off.png" alt="TV off state" width="240">
 </p>
+
+## Compatibility
+
+Tested on an LG OLED65C34LA (webOS 23) with Home Assistant 2026.11. It needs the core `webostv` integration
+set up for the TV; any webOS TV that integration supports should work for the buttons, channels and apps.
+The touchpad pointer, keyboard auto-open and app icons also need the optional
+[lgtv-pointer](https://github.com/mrgiov/lgtv-pointer) integration. Reports for other models are welcome as issues.
 
 ## Features
 
