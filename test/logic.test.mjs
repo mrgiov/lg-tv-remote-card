@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { translator } from '../src/i18n.js';
 import assert from 'node:assert/strict';
 import {
   describeError,
@@ -65,17 +66,19 @@ test('pointerDelta: slow movement uses the base gain, fast movement up to double
   assert.equal(pointerDelta(0, 0).x, 0);
 });
 
+const t = translator('it');
+
 test('statusLabel: covers missing, waking, unavailable, off and playing states', () => {
-  assert.equal(statusLabel(undefined, { waking: false }), 'Entità non trovata');
-  assert.equal(statusLabel({ state: 'off', attributes: {} }, { waking: true }), 'Accensione…');
-  assert.equal(statusLabel({ state: 'unavailable', attributes: {} }, { waking: false }), 'Non raggiungibile');
-  assert.equal(statusLabel({ state: 'off', attributes: {} }, { waking: false }), 'Spenta');
+  assert.equal(statusLabel(undefined, { waking: false, t }), 'Entità non trovata');
+  assert.equal(statusLabel({ state: 'off', attributes: {} }, { waking: true, t }), 'Accensione…');
+  assert.equal(statusLabel({ state: 'unavailable', attributes: {} }, { waking: false, t }), 'Non raggiungibile');
+  assert.equal(statusLabel({ state: 'off', attributes: {} }, { waking: false, t }), 'Spenta');
   assert.equal(
-    statusLabel({ state: 'on', attributes: { source: 'Canali TV', media_title: 'Rai 1' } }, { waking: false }),
+    statusLabel({ state: 'on', attributes: { source: 'Canali TV', media_title: 'Rai 1' } }, { waking: false, t }),
     'Canali TV · Rai 1',
   );
-  assert.equal(statusLabel({ state: 'on', attributes: { source: 'HDMI 1' } }, { waking: false }), 'HDMI 1');
-  assert.equal(statusLabel({ state: 'on', attributes: {} }, { waking: false }), 'Accesa');
+  assert.equal(statusLabel({ state: 'on', attributes: { source: 'HDMI 1' } }, { waking: false, t }), 'HDMI 1');
+  assert.equal(statusLabel({ state: 'on', attributes: {} }, { waking: false, t }), 'Accesa');
 });
 
 test('insertTextPayload: replace is a strict boolean (the TV ignores 0/1)', () => {
@@ -100,10 +103,10 @@ test('keyboardInset: overlay keyboards leave a gap, resizing keyboards and no ke
 });
 
 test('describeError: an unreachable TV wins over the specific context', () => {
-  assert.equal(describeError({ tvOn: false, context: 'text' }).title, 'TV non raggiungibile');
-  assert.equal(describeError({ tvOn: true, context: 'text' }).title, 'Nessun campo di testo aperto');
-  assert.equal(describeError({ tvOn: true, context: 'pointer' }).title, 'Puntatore non disponibile');
-  assert.equal(describeError({ tvOn: true }).title, 'Comando non riuscito');
+  assert.equal(describeError({ tvOn: false, context: 'text', t }).title, 'TV non raggiungibile');
+  assert.equal(describeError({ tvOn: true, context: 'text', t }).title, 'Nessun campo di testo aperto');
+  assert.equal(describeError({ tvOn: true, context: 'pointer', t }).title, 'Puntatore non disponibile');
+  assert.equal(describeError({ tvOn: true, t }).title, 'Comando non riuscito');
 });
 
 test('isHomeScreen: the launcher, or no app at all, counts as home', () => {
@@ -155,6 +158,6 @@ test('tabIndexAt: finds the tab under a point, or the nearest one across a gap o
 });
 
 test('statusLabel: switching off shows a label of its own, ahead of the waking one', () => {
-  assert.equal(statusLabel({ state: 'on', attributes: {} }, { waking: false, sleeping: true }), 'Spegnimento…');
-  assert.equal(statusLabel({ state: 'off', attributes: {} }, { waking: true }), 'Accensione…');
+  assert.equal(statusLabel({ state: 'on', attributes: {} }, { waking: false, sleeping: true, t }), 'Spegnimento…');
+  assert.equal(statusLabel({ state: 'off', attributes: {} }, { waking: true, t }), 'Accensione…');
 });

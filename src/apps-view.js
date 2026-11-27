@@ -52,33 +52,33 @@ function inputKeys(names, { current, onSelect, showIcon }) {
 }
 
 /** The "App" tab: favourite apps first, then all the others in one scrolling grid. Inputs live in the header sheet. */
-export function renderApps(container, { sources, current, config, icons, onSelect, showIcon }) {
+export function renderApps(container, { sources, current, config, icons, onSelect, showIcon, t }) {
   container.replaceChildren();
   if (!sources.length) {
-    container.append(element('div', 'status', 'Elenco disponibile a TV accesa'));
+    container.append(element('div', 'status', t('list.empty')));
     return;
   }
   const groups = groupSources(sources, config);
   const options = { current, icons, onSelect, showIcon };
-  if (groups.favorites.length) container.append(section('PREFERITE', appGrid(groups.favorites, options)));
-  if (groups.others.length) container.append(section(groups.favorites.length ? 'ALTRE APP' : 'APP', appGrid(groups.others, options)));
+  if (groups.favorites.length) container.append(section(t('apps.favorites'), appGrid(groups.favorites, options)));
+  if (groups.others.length) container.append(section(t(groups.favorites.length ? 'apps.others' : 'apps.title'), appGrid(groups.others, options)));
 }
 
 /** Body of the "Ingressi e app" sheet: the same pieces plus a way to the full list. */
-export function renderInputsSheet(container, { sources, current, config, icons, onSelect, showIcon }) {
+export function renderInputsSheet(container, { sources, current, config, icons, onSelect, showIcon, t }) {
   container.replaceChildren();
   if (!sources.length) {
-    container.append(element('div', 'status', 'Elenco disponibile a TV accesa'));
+    container.append(element('div', 'status', t('list.empty')));
     return;
   }
   const groups = groupSources(sources, config);
   const options = { current, icons, onSelect, showIcon };
   const all = element('button', 'key more');
   all.dataset.action = 'show-all-apps';
-  all.textContent = `Tutte le app · ${groups.others.length + groups.favorites.length}`;
+  all.textContent = t('apps.allCount', { n: groups.others.length + groups.favorites.length });
   container.append(
-    section('INGRESSI', inputKeys(groups.inputs, options)),
-    section('APP', appGrid(groups.favorites, options)),
+    section(t('apps.inputs'), inputKeys(groups.inputs, options)),
+    section(t('apps.title'), appGrid(groups.favorites, options)),
     all,
   );
 }

@@ -1,6 +1,7 @@
 /** Visual editor shown in Home Assistant's card settings. Wraps ha-form around EDITOR_SCHEMA. */
 import { DEFAULT_CONFIG } from './constants.js';
-import { EDITOR_HELPERS, EDITOR_LABELS, EDITOR_SCHEMA } from './editor-schema.js';
+import { editorHelper, editorLabel, editorSchema } from './editor-schema.js';
+import { languageOf, translator } from './i18n.js';
 import { hapticLevel } from './logic.js';
 
 /** Home Assistant defines ha-form only once an editor needs it; opening a built-in card's editor forces that. */
@@ -27,10 +28,11 @@ class LgTvRemoteCardEditor extends HTMLElement {
 
   _render() {
     if (!this._form) {
+      const t = translator(languageOf(this._hass));
       this._form = document.createElement('ha-form');
-      this._form.schema = EDITOR_SCHEMA;
-      this._form.computeLabel = (field) => EDITOR_LABELS[field.name] ?? field.name;
-      this._form.computeHelper = (field) => EDITOR_HELPERS[field.name];
+      this._form.schema = editorSchema(t);
+      this._form.computeLabel = (field) => editorLabel(t, field);
+      this._form.computeHelper = (field) => editorHelper(t, field);
       this._form.addEventListener('value-changed', (event) => this._onChange(event));
       this.append(this._form);
     }

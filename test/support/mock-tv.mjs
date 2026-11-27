@@ -67,7 +67,7 @@ export class MockTv {
   }
 
   /** A fresh hass object every time, as Home Assistant does on each state change. */
-  hass({ external = true } = {}) {
+  hass({ external = true, language } = {}) {
     const hass = {
       states: { [ENTITY]: { state: this.state, attributes: this.attributes } },
       services: { lgtv_pointer: { move: {}, click: {}, scroll: {}, watch_keyboard: {}, app_icons: {} } },
@@ -75,6 +75,7 @@ export class MockTv {
       callService: (domain, service, data) => this.callService(domain, service, data),
       callWS: (message) => this.callWS(message),
     };
+    if (language) hass.locale = { language };
     if (external) hass.auth = { external: { fireMessage: (message) => this.haptics.push(message) } };
     return hass;
   }

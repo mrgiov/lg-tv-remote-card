@@ -44,6 +44,7 @@
   window.calls = [];
   window.failNext = false;
   const hass = {
+    locale: { language: new URLSearchParams(location.search).get('lang') ?? 'it' },
     services: { lgtv_pointer: { move: {}, click: {}, scroll: {}, watch_keyboard: {}, app_icons: {} } },
     connection: { subscribeEvents: async (callback) => { window.fireKeyboard = (data) => callback({ data }); return () => {}; } },
     states: { 'media_player.lg_tv': states[scenario] },

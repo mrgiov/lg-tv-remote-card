@@ -62,27 +62,21 @@ export function keyboardAutoAction({ focus, sheetOpen, hasText }) {
 }
 
 /** One-line subtitle shown under the TV name. */
-export function statusLabel(stateObj, { waking, sleeping = false }) {
-  if (!stateObj) return 'Entità non trovata';
-  if (sleeping) return 'Spegnimento…';
-  if (waking) return 'Accensione…';
-  if (stateObj.state === 'unavailable') return 'Non raggiungibile';
-  if (stateObj.state === 'off') return 'Spenta';
+export function statusLabel(stateObj, { waking, sleeping = false, t }) {
+  if (!stateObj) return t('status.notFound');
+  if (sleeping) return t('status.sleeping');
+  if (waking) return t('status.waking');
+  if (stateObj.state === 'unavailable') return t('status.unavailable');
+  if (stateObj.state === 'off') return t('status.off');
   const { source, media_title: title } = stateObj.attributes;
   if (source && title) return `${source} · ${title}`;
-  return source || 'Accesa';
+  return source || t('status.on');
 }
 
 /** User-facing message for a failed command. `context` narrows the cause when known. */
-export function describeError({ tvOn, context }) {
-  if (!tvOn) return { title: 'TV non raggiungibile', hint: 'Accendila e riprova.' };
-  if (context === 'text') {
-    return { title: 'Nessun campo di testo aperto', hint: 'Apri una ricerca sulla TV e riprova.' };
-  }
-  if (context === 'pointer') {
-    return { title: 'Puntatore non disponibile', hint: 'Riprova tra un attimo.' };
-  }
-  return { title: 'Comando non riuscito', hint: 'Riprova.' };
+export function describeError({ tvOn, context, t }) {
+  const kind = !tvOn ? 'unreachable' : context === 'text' || context === 'pointer' ? context : 'generic';
+  return { title: t(`error.${kind}.title`), hint: t(`error.${kind}.hint`) };
 }
 
 /** True on the webOS launcher: nothing is playing, so the "now playing" strip has nothing to show. */

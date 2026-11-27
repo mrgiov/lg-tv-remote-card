@@ -298,3 +298,34 @@ test('an unreachable TV says so instead of failing silently', withCard({ tv: { p
   assert.equal(ui.byId('status').textContent, 'Non raggiungibile');
   assert.equal(ui.byId('standby-title').textContent, 'TV non raggiungibile');
 }));
+
+// ---- language ---------------------------------------------------------------------
+
+test('English Home Assistant: the card speaks English', withCard({ language: 'en', tv: { power: 'unavailable' } }, async ({ ui }) => {
+  assert.equal(ui.byId('status').textContent, 'Unreachable');
+  assert.equal(ui.byId('standby-title').textContent, 'TV unreachable');
+  assert.equal(ui.$('[data-tab="apps"]').getAttribute('aria-label'), 'Apps');
+  assert.equal(ui.byId('channel-search').placeholder, 'Search channels');
+}));
+
+test('Italian Home Assistant: the card speaks Italian', withCard({ language: 'it' }, async ({ ui }) => {
+  assert.equal(ui.$('[data-tab="keys"]').getAttribute('aria-label'), 'Tasti');
+  assert.equal(ui.byId('channel-search').placeholder, 'Cerca un canale');
+}));
+
+test('unsupported or missing language falls back to English', async () => {
+  for (const language of ['de', '', null]) {
+    await withCard({ language, tv: { power: 'off' } }, async ({ ui }) => {
+      assert.equal(ui.byId('status').textContent, 'Off');
+      assert.equal(ui.$('[data-tab="dpad"]').getAttribute('aria-label'), 'Arrows');
+    })();
+  }
+});
+
+test('English: app sections and the number pad prompt', withCard({ language: 'en' }, async ({ ui }) => {
+  ui.click('[data-tab="apps"]');
+  await until(() => ui.$$('#apps .label').length === 2);
+  assert.deepEqual(ui.$$('#apps .label').map((label) => label.textContent), ['FAVOURITES', 'OTHER APPS']);
+  ui.click('[data-action="open-numpad"]');
+  assert.equal(ui.byId('num-name').textContent, 'Type the channel number');
+}));

@@ -18,172 +18,172 @@ const key = (content, { button, action, className = '', label = '' }) => {
   return `<button class="key ${className}" ${target}${aria}>${content}</button>`;
 };
 
-const dpad = () => `
+const dpad = (t) => `
   <div class="dpad">
-    <span></span>${key(icon('chevron-up'), { button: 'UP', label: 'Su' })}<span></span>
-    ${key(icon('chevron-left'), { button: 'LEFT', label: 'Sinistra' })}${key('OK', { button: 'ENTER', className: 'ok primary' })}${key(icon('chevron-right'), { button: 'RIGHT', label: 'Destra' })}
-    <span></span>${key(icon('chevron-down'), { button: 'DOWN', label: 'Giù' })}<span></span>
+    <span></span>${key(icon('chevron-up'), { button: 'UP', label: t('label.up') })}<span></span>
+    ${key(icon('chevron-left'), { button: 'LEFT', label: t('label.left') })}${key('OK', { button: 'ENTER', className: 'ok primary' })}${key(icon('chevron-right'), { button: 'RIGHT', label: t('label.right') })}
+    <span></span>${key(icon('chevron-down'), { button: 'DOWN', label: t('label.down') })}<span></span>
   </div>`;
 
-const transport = () => `
+const transport = (t) => `
   <div class="transport">
-    ${key(icon('rewind'), { button: 'REWIND', label: 'Indietro veloce' })}
-    ${key(icon('play-pause'), { action: 'play-pause', label: 'Play e pausa' })}
-    ${key(icon('fast-forward'), { button: 'FASTFORWARD', label: 'Avanti veloce' })}
+    ${key(icon('rewind'), { button: 'REWIND', label: t('label.rewind') })}
+    ${key(icon('play-pause'), { action: 'play-pause', label: t('label.playPause') })}
+    ${key(icon('fast-forward'), { button: 'FASTFORWARD', label: t('label.fastForward') })}
   </div>`;
 
-const keypad = () => {
+const keypad = (t) => {
   const digits = [1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => key(n, { button: String(n) })).join('');
   return `
-    <div class="keypad">${digits}${key('Lista', { button: 'LIST' })}${key('0', { button: '0' })}${key('Guida', { button: 'GUIDE' })}</div>
+    <div class="keypad">${digits}${key(t('label.list'), { button: 'LIST' })}${key('0', { button: '0' })}${key(t('label.guide'), { button: 'GUIDE' })}</div>
     <div class="keys-extra">
-      ${key(icon('menu'), { button: 'MENU', label: 'Menu' })}
-      ${key(icon('information-outline'), { button: 'INFO', label: 'Info' })}
-      ${key(icon('exit-to-app'), { button: 'EXIT', label: 'Esci' })}
+      ${key(icon('menu'), { button: 'MENU', label: t('label.menu') })}
+      ${key(icon('information-outline'), { button: 'INFO', label: t('label.info') })}
+      ${key(icon('exit-to-app'), { button: 'EXIT', label: t('label.exit') })}
     </div>
     <div class="colors">
-      ${key('', { button: 'RED', className: 'red', label: 'Rosso' })}${key('', { button: 'GREEN', className: 'green', label: 'Verde' })}
-      ${key('', { button: 'YELLOW', className: 'yellow', label: 'Giallo' })}${key('', { button: 'BLUE', className: 'blue', label: 'Blu' })}
+      ${key('', { button: 'RED', className: 'red', label: t('label.red') })}${key('', { button: 'GREEN', className: 'green', label: t('label.green') })}
+      ${key('', { button: 'YELLOW', className: 'yellow', label: t('label.yellow') })}${key('', { button: 'BLUE', className: 'blue', label: t('label.blue') })}
     </div>`;
 };
 
-const sheetHead = (title, extra = '') => `
+const sheetHead = (t, title, extra = '') => `
   <div class="sheet-grip"></div>
-  <div class="sheet-head"><b>${title}</b>${extra}${key(icon('close'), { action: 'close-sheet', label: 'Chiudi' })}</div>`;
+  <div class="sheet-head"><b>${title}</b>${extra}${key(icon('close'), { action: 'close-sheet', label: t('label.close') })}</div>`;
 
-const keyboardSheet = () => `
-  <div class="kb-sheet" id="kb-sheet" role="dialog" aria-label="Tastiera">
+const keyboardSheet = (t) => `
+  <div class="kb-sheet" id="kb-sheet" role="dialog" aria-label="${t('label.keyboard')}">
     <div class="sheet-grip"></div>
     <div class="line">
-      <input type="text" id="text" placeholder="Scrivi o detta…" autocomplete="off" autocapitalize="sentences" enterkeyhint="send">
-      ${key(icon('microphone'), { action: 'dictate', className: 'icon-only', label: 'Detta' })}
-      ${key(icon('close'), { action: 'close-sheet', className: 'icon-only', label: 'Chiudi' })}
+      <input type="text" id="text" placeholder="${t('kb.placeholder')}" autocomplete="off" autocapitalize="sentences" enterkeyhint="send">
+      ${key(icon('microphone'), { action: 'dictate', className: 'icon-only', label: t('label.dictate') })}
+      ${key(icon('close'), { action: 'close-sheet', className: 'icon-only', label: t('label.close') })}
     </div>
     <div class="line">
-      ${key('Cancella', { action: 'clear-text' })}
-      ${key(`${icon('keyboard-return')}&nbsp;Invio`, { action: 'enter-key', className: 'primary' })}
+      ${key(t('label.clear'), { action: 'clear-text' })}
+      ${key(`${icon('keyboard-return')}&nbsp;${t('label.enter')}`, { action: 'enter-key', className: 'primary' })}
     </div>
-    <div class="status">Il testo appare subito sul campo aperto della TV. Invio conferma e chiude.</div>
+    <div class="status">${t('kb.hint')}</div>
   </div>`;
 
-const channelsSheet = () => `
-  <div class="panel-sheet" id="channels-sheet" role="dialog" aria-label="Canali">
-    ${sheetHead('Canali', key(icon('dialpad'), { action: 'open-numpad', label: 'Digita il numero' }))}
-    <label class="search">${icon('magnify')}<input type="search" id="channel-search" placeholder="Cerca un canale" autocomplete="off" enterkeyhint="search"></label>
+const channelsSheet = (t) => `
+  <div class="panel-sheet" id="channels-sheet" role="dialog" aria-label="${t('label.channels')}">
+    ${sheetHead(t, t('label.channels'), key(icon('dialpad'), { action: 'open-numpad', label: t('label.typeNumber') }))}
+    <label class="search">${icon('magnify')}<input type="search" id="channel-search" placeholder="${t('search.placeholder')}" autocomplete="off" enterkeyhint="search"></label>
     <div class="sheet-scroll" id="channel-list"></div>
   </div>`;
 
-const numpadSheet = () => {
+const numpadSheet = (t) => {
   const digit = (n) => `<button class="key" data-digit="${n}">${n}</button>`;
   return `
-  <div class="panel-sheet" id="numpad-sheet" role="dialog" aria-label="Numero del canale">
-    ${sheetHead('Numero del canale')}
-    <div class="num-display" id="num-display" role="button" aria-label="Vai al canale"><span class="num-ring" id="num-ring"></span><b id="num-value"></b><span id="num-name"></span></div>
+  <div class="panel-sheet" id="numpad-sheet" role="dialog" aria-label="${t('label.channelNumber')}">
+    ${sheetHead(t, t('label.channelNumber'))}
+    <div class="num-display" id="num-display" role="button" aria-label="${t('label.goToChannel')}"><span class="num-ring" id="num-ring"></span><b id="num-value"></b><span id="num-name"></span></div>
     <div class="num-keys">
       ${[1, 2, 3, 4, 5, 6, 7, 8, 9].map(digit).join('')}
-      <button class="key" data-digit="-" aria-label="Trattino">${icon('minus')}</button>${digit(0)}<button class="key" data-digit="del" aria-label="Cancella">${icon('backspace-outline')}</button>
+      <button class="key" data-digit="-" aria-label="${t('label.dash')}">${icon('minus')}</button>${digit(0)}<button class="key" data-digit="del" aria-label="${t('label.delete')}">${icon('backspace-outline')}</button>
     </div>
   </div>`;
 };
 
-const inputsSheet = () => `
-  <div class="panel-sheet" id="inputs-sheet" role="dialog" aria-label="Ingressi e app">
-    ${sheetHead('Ingressi e app')}
+const inputsSheet = (t) => `
+  <div class="panel-sheet" id="inputs-sheet" role="dialog" aria-label="${t('label.inputsAndApps')}">
+    ${sheetHead(t, t('label.inputsAndApps'))}
     <div class="sheet-scroll" id="inputs-body"></div>
   </div>`;
 
 /** Expanding controls opened from the dock, like the Control Center sliders: volume and channel. */
-const popovers = () => `
+const popovers = (t) => `
   <div class="pop-scrim" id="pop-scrim"></div>
-  <div class="pop" id="pop-volume" role="dialog" aria-label="Volume">
+  <div class="pop" id="pop-volume" role="dialog" aria-label="${t('label.volume')}">
     <div class="vpill" id="vpill"><div class="vfill" id="vfill"></div><div class="vlabel">${icon('volume-high')}<b id="vol-level">–</b></div></div>
     <div class="pop-row">
-      <button class="key" data-repeat="VOLUMEDOWN" aria-label="Volume giù">${icon('minus')}</button>
-      <button class="key" data-repeat="VOLUMEUP" aria-label="Volume su">${icon('plus')}</button>
+      <button class="key" data-repeat="VOLUMEDOWN" aria-label="${t('label.volumeDown')}">${icon('minus')}</button>
+      <button class="key" data-repeat="VOLUMEUP" aria-label="${t('label.volumeUp')}">${icon('plus')}</button>
     </div>
   </div>
-  <div class="pop" id="pop-channel" role="dialog" aria-label="Canale">
+  <div class="pop" id="pop-channel" role="dialog" aria-label="${t('label.channel')}">
     <div class="cpill">
-      <button class="key" data-repeat="CHANNELUP" aria-label="Canale su">${icon('chevron-up')}</button>
+      <button class="key" data-repeat="CHANNELUP" aria-label="${t('label.channelUp')}">${icon('chevron-up')}</button>
       <div class="clabel"><b id="pop-channel-number">–</b><span id="pop-channel-name"></span></div>
-      <button class="key" data-repeat="CHANNELDOWN" aria-label="Canale giù">${icon('chevron-down')}</button>
+      <button class="key" data-repeat="CHANNELDOWN" aria-label="${t('label.channelDown')}">${icon('chevron-down')}</button>
     </div>
     <div class="pop-row">
-      <button class="key" data-action="open-numpad" aria-label="Digita il numero">${icon('dialpad')}</button>
-      <button class="key" data-action="open-channels" aria-label="Elenco canali">${icon('format-list-bulleted')}</button>
+      <button class="key" data-action="open-numpad" aria-label="${t('label.typeNumber')}">${icon('dialpad')}</button>
+      <button class="key" data-action="open-channels" aria-label="${t('label.channelList')}">${icon('format-list-bulleted')}</button>
     </div>
   </div>`;
 
 const TAB_BUTTONS = [
-  { tab: 'dpad', icon: 'dpad', label: 'Frecce' },
-  { tab: 'pad', icon: 'touch', label: 'Touchpad' },
-  { tab: 'keys', icon: 'keypad', label: 'Tasti' },
-  { tab: 'apps', icon: 'apps', label: 'App' },
+  { tab: 'dpad', icon: 'dpad' },
+  { tab: 'pad', icon: 'touch' },
+  { tab: 'keys', icon: 'keypad' },
+  { tab: 'apps', icon: 'apps' },
 ];
 
-export function cardTemplate() {
-  const tabBar = TAB_BUTTONS.map((t) => `<button class="tab" data-tab="${t.tab}" aria-label="${t.label}">${tabIcon(t.icon)}<span class="tab-label">${t.label}</span></button>`).join('');
+export function cardTemplate(t) {
+  const tabBar = TAB_BUTTONS.map((tab) => `<button class="tab" data-tab="${tab.tab}" aria-label="${t(`tab.${tab.tab}`)}">${tabIcon(tab.icon)}<span class="tab-label">${t(`tab.${tab.tab}`)}</span></button>`).join('');
   return `
 <ha-card>
   <div class="kb-backdrop" id="kb-backdrop"></div>
   <div class="head">
-    <button class="key power" id="power" aria-label="Accensione">${icon('power')}</button>
+    <button class="key power" id="power" aria-label="${t('label.power')}">${icon('power')}</button>
     <div class="info"><div class="title" id="name"></div><div class="status" id="status"></div></div>
-    <button class="key" data-action="open-inputs" aria-label="Ingressi e app" data-group="controls">${icon('video-input-hdmi')}</button>
-    <button class="key" id="mute" data-action="mute" aria-label="Muto"></button>
+    <button class="key" data-action="open-inputs" aria-label="${t('label.inputsAndApps')}" data-group="controls">${icon('video-input-hdmi')}</button>
+    <button class="key" id="mute" data-action="mute" aria-label="${t('label.mute')}"></button>
   </div>
 
   <div class="now" id="now" data-mode="live" data-group="controls">
-    <button class="key step live-only" data-repeat="CHANNELDOWN" aria-label="Canale giù">${icon('chevron-left')}</button>
-    <button class="open" data-action="open-now" aria-label="Canali e app">
+    <button class="key step live-only" data-repeat="CHANNELDOWN" aria-label="${t('label.channelDown')}">${icon('chevron-left')}</button>
+    <button class="open" data-action="open-now" aria-label="${t('label.channelsAndApps')}">
       <div class="logo" id="now-logo"></div>
       <div class="text"><div class="line1" id="now-title"></div><div class="line2" id="now-sub"></div><div class="bar" id="now-bar"><i id="now-fill"></i></div></div>
     </button>
-    <button class="key step live-only" data-repeat="CHANNELUP" aria-label="Canale su">${icon('chevron-right')}</button>
-    <button class="key step app-only" data-button="REWIND" aria-label="Indietro veloce">${icon('rewind')}</button>
-    <button class="key step app-only" data-action="play-pause" aria-label="Play e pausa">${icon('play-pause')}</button>
-    <button class="key step app-only" data-button="FASTFORWARD" aria-label="Avanti veloce">${icon('fast-forward')}</button>
+    <button class="key step live-only" data-repeat="CHANNELUP" aria-label="${t('label.channelUp')}">${icon('chevron-right')}</button>
+    <button class="key step app-only" data-button="REWIND" aria-label="${t('label.rewind')}">${icon('rewind')}</button>
+    <button class="key step app-only" data-action="play-pause" aria-label="${t('label.playPause')}">${icon('play-pause')}</button>
+    <button class="key step app-only" data-button="FASTFORWARD" aria-label="${t('label.fastForward')}">${icon('fast-forward')}</button>
   </div>
 
   <div class="body" id="body" data-active-tab="dpad">
     <div class="stage" id="stage">
       <div class="center" id="center">
-        <div class="panel" data-panel="dpad">${dpad()}${transport()}</div>
+        <div class="panel" data-panel="dpad">${dpad(t)}${transport(t)}</div>
         <div class="panel" data-panel="pad"><div class="pad" id="pad"></div></div>
-        <div class="panel" data-panel="keys">${keypad()}</div>
+        <div class="panel" data-panel="keys">${keypad(t)}</div>
       </div>
       <div class="scroll-view" data-view="apps"><div id="apps"></div></div>
 
       <div class="standby-overlay">
-        <button class="power-big" id="power-big" aria-label="Accendi la TV">${icon('power')}</button>
+        <button class="power-big" id="power-big" aria-label="${t('standby.off')}">${icon('power')}</button>
         <div><b id="standby-title"></b><span id="standby-hint"></span></div>
       </div>
       <div class="toast" id="toast" role="status"></div>
       <div class="sheet" id="sheet">
-        <b>Spegnere la TV?</b>
+        <b>${t('sheet.powerOff')}</b>
         <div class="hint" id="sheet-hint"></div>
         <div class="track"><div class="fill" id="sheet-fill"></div></div>
       </div>
     </div>
-    <div class="rail scroll" id="strip"><span>▲</span><span class="vertical">scorri</span><span>▼</span></div>
+    <div class="rail scroll" id="strip"><span>▲</span><span class="vertical">${t('rail.scroll')}</span><span>▼</span></div>
   </div>
 
   <div class="dock" data-group="controls">
-    ${key(icon('keyboard-backspace'), { button: 'BACK', label: 'Indietro' })}
-    ${key(icon('home'), { button: 'HOME', label: 'Home' })}
-    ${key(icon('keyboard-outline'), { action: 'open-keyboard', label: 'Tastiera' })}
-    <button class="key" data-action="toggle-volume" id="dock-volume" aria-label="Volume">${icon('volume-high')}</button>
-    <button class="key" data-action="toggle-channel" id="dock-channel" aria-label="Canali">${icon('television-guide')}</button>
+    ${key(icon('keyboard-backspace'), { button: 'BACK', label: t('label.back') })}
+    ${key(icon('home'), { button: 'HOME', label: t('label.home') })}
+    ${key(icon('keyboard-outline'), { action: 'open-keyboard', label: t('label.keyboard') })}
+    <button class="key" data-action="toggle-volume" id="dock-volume" aria-label="${t('label.volume')}">${icon('volume-high')}</button>
+    <button class="key" data-action="toggle-channel" id="dock-channel" aria-label="${t('label.channels')}">${icon('television-guide')}</button>
   </div>
   <div class="tabs" id="tabs" data-group="controls"><span class="tab-pill" id="tab-pill"><i class="blob" id="tab-blob"></i></span>${tabBar}</div>
-  ${popovers()}
-  ${keyboardSheet()}${channelsSheet()}${numpadSheet()}${inputsSheet()}
+  ${popovers(t)}
+  ${keyboardSheet(t)}${channelsSheet(t)}${numpadSheet(t)}${inputsSheet(t)}
 </ha-card>`;
 }
 
 export const muteIcon = (muted) => icon(muted ? 'volume-off' : 'volume-high');
 
-export const padHint = (hasPointer) =>
+export const padHint = (hasPointer, t) =>
   hasPointer
-    ? `${icon('cursor-default-click-outline')}<span>Trascina per muovere<br>Tocca per cliccare<br>Doppio tocco tenuto: trascina</span>`
-    : `${icon('gesture-swipe')}<span>Swipe = frecce<br>Tocco = OK</span>`;
+    ? `${icon('cursor-default-click-outline')}<span>${t('pad.pointer')}</span>`
+    : `${icon('gesture-swipe')}<span>${t('pad.swipe')}</span>`;

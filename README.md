@@ -4,7 +4,7 @@
 
 Lovelace card that turns a phone into a remote for an LG webOS TV (OLED, QNED, NanoCell), built on the core
 `webostv` integration of Home Assistant. It has a magic-remote style touchpad, channel list with programmes,
-number pad, app launcher and keyboard. Italian UI.
+number pad, app launcher and keyboard. English and Italian, picked automatically from the Home Assistant language.
 
 <p align="center"><img src="docs/demo.gif" alt="The card in use: tabs, channel list, number pad, volume, TV off" width="300"></p>
 
@@ -38,12 +38,14 @@ The touchpad pointer, keyboard auto-open and app icons also need the optional
 - Inputs and apps sheet (header icon): HDMI inputs, favourite apps with the TV's own icons
 - Touchpad with a real TV pointer (tap = click, double-tap and hold = drag, side strip = scroll)
 - D-pad tab, keys tab (digits, menu, info, exit, colour keys), apps tab, keyboard bottom sheet (live text, dictation)
+- English and Italian interface, chosen from your Home Assistant language (English for any other language)
 - Swipe between tabs, clear states for "TV off", "waking" and failed commands
 
 ## Layout
 
 ```
 src/constants.js          every tunable number and static list
+src/i18n.js               English and Italian texts, language picked from Home Assistant
 src/logic.js              pure functions (no DOM, no Home Assistant), unit tested
 src/channels.js           pure channel helpers (programme on air, favourites, number entry)
 src/tv-data.js            reads channel list, programme and app icons from the TV (with a browser cache)

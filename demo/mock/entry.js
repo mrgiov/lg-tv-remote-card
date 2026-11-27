@@ -10,7 +10,7 @@ const card = document.createElement('lg-tv-remote-card');
 card.setConfig({ type: 'custom:lg-tv-remote-card', entity: tv.entity, name: 'TV Salotto' });
 $('card-slot').append(card);
 
-const push = () => { card.hass = tv.hass({ external }); renderPanel(); };
+const push = () => { card.hass = tv.hass({ external, language: navigator.language }); renderPanel(); };
 tv.onChange = push;
 
 // ---- log -----------------------------------------------------------------

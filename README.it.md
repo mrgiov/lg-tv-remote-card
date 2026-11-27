@@ -4,7 +4,7 @@
 
 Card Lovelace che trasforma lo smartphone nel telecomando di una TV LG webOS (OLED, QNED, NanoCell), basata
 sull'integrazione `webostv` di Home Assistant. Ha un touchpad come il Magic Remote, elenco canali con programmi,
-tastierino numerico, app e tastiera. Interfaccia in italiano.
+tastierino numerico, app e tastiera. Interfaccia in inglese e italiano, scelta automaticamente dalla lingua di Home Assistant.
 
 <p align="center"><img src="docs/demo.gif" alt="La card in uso: schede, elenco canali, tastierino, volume, TV spenta" width="300"></p>
 
@@ -38,12 +38,14 @@ l'integrazione opzionale [lgtv-pointer](https://github.com/mrgiov/lgtv-pointer).
 - Foglio ingressi e app (icona in alto): ingressi HDMI, app preferite con le icone originali della TV
 - Touchpad con vero puntatore sulla TV (tocco = clic, doppio tocco e tieni premuto = trascina, striscia laterale = scorri)
 - Tab frecce, tab tasti (cifre, menu, info, esci, tasti colorati), tab app, tastiera a comparsa (testo in tempo reale, dettatura)
+- Interfaccia in inglese e italiano, scelta dalla lingua di Home Assistant (inglese per ogni altra lingua)
 - Scorrimento tra le tab con uno swipe, stati chiari per «TV spenta», «accensione» e comandi falliti
 
 ## Struttura
 
 ```
 src/constants.js          ogni numero regolabile e ogni elenco statico
+src/i18n.js               testi in inglese e italiano, lingua scelta da Home Assistant
 src/logic.js              funzioni pure (niente DOM, niente Home Assistant), con test
 src/channels.js           funzioni pure sui canali (programma in onda, preferiti, numero digitato)
 src/tv-data.js            legge dalla TV elenco canali, programma e icone delle app (con cache del browser)

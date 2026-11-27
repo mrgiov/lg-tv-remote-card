@@ -37,15 +37,15 @@ export async function until(check, timeoutMs = 2000, stepMs = 10) {
 }
 
 /** Mounts a card wired to a mock TV; every TV change is pushed into the card like Home Assistant does. */
-export async function mountCard(tv, { config = {}, external = true } = {}) {
+export async function mountCard(tv, { config = {}, external = true, language = 'it' } = {}) {
   await setupDom();
   localStorage.clear();
   window.vibrationLog.length = 0;
   const card = document.createElement('lg-tv-remote-card');
   document.body.append(card);
   card.setConfig({ type: 'custom:lg-tv-remote-card', entity: tv.entity, name: 'TV Salotto', ...config });
-  tv.onChange = () => { card.hass = tv.hass({ external }); };
-  card.hass = tv.hass({ external });
+  tv.onChange = () => { card.hass = tv.hass({ external, language }); };
+  card.hass = tv.hass({ external, language });
   const root = card.shadowRoot;
   return {
     card, root,

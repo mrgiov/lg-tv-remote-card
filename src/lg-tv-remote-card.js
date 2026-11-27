@@ -14,6 +14,7 @@ import {
 } from './channels.js';
 import { loadAppIcons, loadChannelList, loadProgramInfo, readCache, writeCache } from './tv-data.js';
 import { STYLES } from './styles.js';
+import { languageOf, translator } from './i18n.js';
 import { cardTemplate, icon, muteIcon, padHint } from './template.js';
 import { renderApps, renderInputsSheet } from './apps-view.js';
 import { channelListHtml } from './channels-view.js';
@@ -51,11 +52,12 @@ class LgTvRemoteCard extends HTMLElement {
     this._showAllChannels = false;
     this._typed = '';
     this._icons = {};
-    if (!this._root) this._render();
   }
 
   set hass(hass) {
     this._hass = hass;
+    this._t = translator(languageOf(hass));
+    if (!this._root && this._config) this._render(); // drawn once the language is known
     this._subscribeKeyboardEvents();
     this._refresh();
   }
@@ -123,7 +125,7 @@ class LgTvRemoteCard extends HTMLElement {
 
   _render() {
     this._root = this.attachShadow({ mode: 'open' });
-    this._root.innerHTML = `<style>${STYLES}</style>${cardTemplate()}`;
+    this._root.innerHTML = `<style>${STYLES}</style>${cardTemplate(this._t)}`;
     this._ui = this._queryElements();
     this._wire();
     this._goToTab(this._tab);
@@ -209,15 +211,15 @@ class LgTvRemoteCard extends HTMLElement {
 
     this._watchTvKeyboard(on);
     ui.name.textContent = this._config.name || attributes.friendly_name || 'TV';
-    ui.status.textContent = statusLabel(stateObj, { waking, sleeping });
+    ui.status.textContent = statusLabel(stateObj, { waking, sleeping, t: this._t });
     ui.power.classList.toggle('busy', waking || sleeping);
     ui.power.classList.toggle('off', !on); // red only while the TV is on
     ui.stage.classList.toggle('standby', !on);
     ui.controls.forEach((node) => node.classList.toggle('disabled', !on));
     ui.mute.classList.toggle('disabled', !on);
 
-    ui.standbyTitle.textContent = waking ? 'Accensione in corso…' : stateObj?.state === 'unavailable' ? 'TV non raggiungibile' : 'Accendi la TV';
-    ui.standbyHint.textContent = waking ? 'Attendi qualche secondo' : 'Ci vogliono circa 15 secondi';
+    ui.standbyTitle.textContent = this._t(waking ? 'standby.waking' : stateObj?.state === 'unavailable' ? 'standby.unavailable' : 'standby.off');
+    ui.standbyHint.textContent = this._t(waking ? 'standby.wakingHint' : 'standby.offHint');
     ui.powerBig.classList.toggle('busy', waking);
 
     const muted = Boolean(attributes.is_volume_muted);
@@ -226,7 +228,7 @@ class LgTvRemoteCard extends HTMLElement {
     this._renderVolume(attributes.volume_level, muted);
 
     ui.strip.classList.toggle('available', this._hasPointer);
-    ui.pad.innerHTML = padHint(this._hasPointer);
+    ui.pad.innerHTML = padHint(this._hasPointer, this._t);
 
     const sources = attributes.source_list ?? [];
     const renderKey = `${sources.join('|')}#${attributes.source ?? ''}#${Object.keys(this._icons).length}`;
@@ -245,7 +247,7 @@ class LgTvRemoteCard extends HTMLElement {
   }
 
   _renderSources(sources, current) {
-    const options = { sources, current, config: this._config, icons: this._icons, showIcon: icon, onSelect: (source) => this._selectSource(source) };
+    const options = { sources, current, config: this._config, icons: this._icons, showIcon: icon, t: this._t, onSelect: (source) => this._selectSource(source) };
     renderApps(this._ui.apps, options);
     renderInputsSheet(this._ui.inputsBody, options);
   }
@@ -284,7 +286,7 @@ class LgTvRemoteCard extends HTMLElement {
       ui.nowLogo.style.cssText = `--logo:${channelColor(name)}`;
       ui.nowLogo.textContent = number ?? '';
       ui.nowTitle.textContent = name;
-      ui.nowSub.textContent = program ? `${program.name} · ${program.minutesLeft} min` : 'Canali TV';
+      ui.nowSub.textContent = program ? `${program.name} · ${this._t('now.minutes', { n: program.minutesLeft })}` : 'Canali TV';
       if (program) { ui.nowBar.style.display = ''; ui.nowFill.style.width = `${Math.round(program.progress * 100)}%`; }
       tint = channelColor(name);
       ui.popChannelNumber.textContent = number ?? '–';
@@ -295,7 +297,7 @@ class LgTvRemoteCard extends HTMLElement {
       ui.nowLogo.style.cssText = iconUrl ? `background-image:url("${iconUrl}")` : `--logo:${BRAND_COLORS[source] ?? '#444'}`;
       ui.nowLogo.textContent = iconUrl ? '' : source.charAt(0);
       ui.nowTitle.textContent = source;
-      ui.nowSub.textContent = /^HDMI/.test(source) ? 'Ingresso' : 'In riproduzione';
+      ui.nowSub.textContent = /^HDMI/.test(source) ? this._t('now.input') : this._t('now.playing');
       tint = BRAND_COLORS[source] ?? '#1d4ed8';
       ui.popChannelNumber.textContent = '–';
       ui.popChannelName.textContent = source;
@@ -666,7 +668,7 @@ class LgTvRemoteCard extends HTMLElement {
   _renderChannelList() {
     this._ui.channelList.innerHTML = channelListHtml({
       channels: this._channels, favorites: this._favorites, query: this._channelQuery, showAll: this._showAllChannels,
-      current: this._now?.number, programs: this._programs,
+      current: this._now?.number, programs: this._programs, t: this._t,
     });
   }
 
@@ -721,9 +723,9 @@ class LgTvRemoteCard extends HTMLElement {
     const { numValue, numName } = this._ui;
     const channel = channelForNumber(this._channels, this._typed);
     numValue.textContent = this._typed;
-    if (!this._typed) numName.textContent = 'Scrivi il numero del canale';
+    if (!this._typed) numName.textContent = this._t('num.prompt');
     else if (channel) numName.textContent = channel.name;
-    else numName.textContent = this._typed.length >= 2 ? 'Canale non trovato' : '';
+    else numName.textContent = this._typed.length >= 2 ? this._t('num.notFound') : '';
   }
 
   _armNumberTimer() {
@@ -766,15 +768,15 @@ class LgTvRemoteCard extends HTMLElement {
   _dictate() {
     const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!Recognition) {
-      this._ui.text.placeholder = 'Usa il microfono della tastiera';
+      this._ui.text.placeholder = this._t('dictate.unsupported');
       this._ui.text.focus();
       return;
     }
     const recognition = new Recognition();
-    recognition.lang = 'it-IT';
+    recognition.lang = this._t('dictate.lang');
     recognition.interimResults = false;
     recognition.onresult = (event) => { this._ui.text.value = event.results[0][0].transcript; this._syncText(); };
-    recognition.onerror = () => { this._ui.text.placeholder = 'Dettatura non riuscita'; };
+    recognition.onerror = () => { this._ui.text.placeholder = this._t('dictate.failed'); };
     recognition.start();
   }
 
@@ -797,7 +799,7 @@ class LgTvRemoteCard extends HTMLElement {
   _startPowerHold() {
     const { sheet, sheetHint, sheetFill, power } = this._ui;
     clearTimeout(this._sheetHideTimer);
-    sheetHint.textContent = 'Tieni premuto il tasto per un secondo';
+    sheetHint.textContent = this._t('hold.start');
     sheet.classList.add('visible');
     power.classList.add('holding');
     this._setHoldProgress(0, 'none');
@@ -820,7 +822,7 @@ class LgTvRemoteCard extends HTMLElement {
   _cancelPowerHold() {
     this._ui.power.classList.remove('holding');
     this._setHoldProgress(0, 'none');
-    this._ui.sheetHint.textContent = 'Tieni premuto più a lungo per spegnere';
+    this._ui.sheetHint.textContent = this._t('hold.more');
     this._sheetHideTimer = setTimeout(() => this._ui.sheet.classList.remove('visible'), SHEET_HIDE_MS);
   }
 
@@ -833,7 +835,7 @@ class LgTvRemoteCard extends HTMLElement {
 
   _showError(context) {
     this._haptic('error');
-    const { title, hint } = describeError({ tvOn: this._tvOn, context });
+    const { title, hint } = describeError({ tvOn: this._tvOn, context, t: this._t });
     this._ui.toast.innerHTML = `<b>${title}</b><br>${hint}`;
     this._ui.toast.classList.add('visible');
     clearTimeout(this._toastTimer);
@@ -846,5 +848,5 @@ window.customCards = window.customCards || [];
 window.customCards.push({
   type: 'lg-tv-remote-card',
   name: 'LG TV Remote',
-  description: 'Telecomando LG webOS per smartphone: touchpad, app, testo, volume e canali',
+  description: 'LG webOS remote for your phone: touchpad, apps, text, volume and channels',
 });
