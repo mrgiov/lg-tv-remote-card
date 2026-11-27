@@ -25,6 +25,7 @@ export function appTile(name, { current, icons, onSelect }) {
     badge.style.background = BRAND_COLORS[name] ?? FALLBACK_TILE_COLOR;
     badge.textContent = name.charAt(0);
   }
+  if (name === current) tile.setAttribute('aria-current', 'true');
   tile.append(badge, element('span', '', name));
   tile.addEventListener('click', () => onSelect(name));
   return tile;
@@ -45,6 +46,7 @@ function inputKeys(names, { current, onSelect, showIcon }) {
     const button = element('button', name === current ? 'key current' : 'key');
     button.innerHTML = `${showIcon(inputIcon(name))}<span>${name.replace('HDMI ', '')}</span>`;
     button.setAttribute('aria-label', name);
+    if (name === current) button.setAttribute('aria-current', 'true');
     button.addEventListener('click', () => onSelect(name));
     grid.append(button);
   });

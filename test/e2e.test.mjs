@@ -329,3 +329,43 @@ test('English: app sections and the number pad prompt', withCard({ language: 'en
   ui.click('[data-action="open-numpad"]');
   assert.equal(ui.byId('num-name').textContent, 'Type the channel number');
 }));
+
+// ---- accessibility ------------------------------------------------------------------
+
+const keydown = (target, key) => target.dispatchEvent(new window.KeyboardEvent('keydown', { key, bubbles: true, composed: true, cancelable: true }));
+
+test('tabs expose the selected one; mute and dock toggles expose their state', withCard({}, async ({ tv, ui }) => {
+  assert.equal(ui.$('#tabs').getAttribute('role'), 'tablist');
+  assert.equal(ui.$('[data-tab="dpad"]').getAttribute('aria-selected'), 'true');
+  ui.click('[data-tab="keys"]');
+  assert.equal(ui.$('[data-tab="keys"]').getAttribute('aria-selected'), 'true');
+  assert.equal(ui.$('[data-tab="dpad"]').getAttribute('aria-selected'), 'false');
+  assert.equal(ui.byId('mute').getAttribute('aria-pressed'), 'false');
+  tv.muted = true;
+  tv.onChange();
+  assert.equal(ui.byId('mute').getAttribute('aria-pressed'), 'true');
+  ui.click('#dock-volume');
+  assert.equal(ui.byId('dock-volume').getAttribute('aria-expanded'), 'true');
+  keydown(ui.byId('dock-volume'), 'Escape');
+  assert.equal(ui.byId('dock-volume').getAttribute('aria-expanded'), 'false');
+}));
+
+test('an open sheet makes the rest of the card inert; Escape closes it from anywhere', withCard({}, async ({ ui }) => {
+  ui.click('[data-action="open-channels"]');
+  assert.equal(ui.$('.dock').inert, true);
+  assert.ok(!ui.byId('channels-sheet').inert);
+  keydown(ui.byId('channels-sheet'), 'Escape');
+  assert.equal(ui.$('ha-card').dataset.sheet, undefined);
+  assert.ok(!ui.$('.dock').inert);
+}));
+
+test('repeat keys work from the keyboard: one press per Enter or Space', withCard({}, async ({ tv, ui }) => {
+  const key = ui.$('.now [data-repeat="CHANNELUP"]');
+  keydown(key, 'Enter');
+  await until(() => tv.calls.some((call) => call.data?.button === 'CHANNELUP'));
+  const presses = () => tv.calls.filter((call) => call.data?.button === 'CHANNELUP').length;
+  assert.equal(presses(), 1);
+  key.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Enter', repeat: true, bubbles: true, cancelable: true }));
+  await wait(50);
+  assert.equal(presses(), 1); // holding the key down does not flood the TV
+}));

@@ -13,7 +13,7 @@ function programLine(program, t) {
 function channelRow(channel, { current, starred, program, t }) {
   const mini = program?.name ? `<div class="mini"><i style="width:${Math.round(program.progress * 100)}%"></i></div>` : '';
   return `
-    <div class="ch-row${channel.number === current ? ' current' : ''}" role="button" tabindex="0" data-channel="${escapeHtml(channel.number)}">
+    <div class="ch-row${channel.number === current ? ' current' : ''}" role="button" tabindex="0"${channel.number === current ? ' aria-current="true"' : ''} data-channel="${escapeHtml(channel.number)}">
       <div class="logo" style="--logo:${channelColor(channel.name)}">${escapeHtml(channel.number)}</div>
       <div class="text"><div class="line1">${escapeHtml(channel.name)}</div><div class="line2">${programLine(program, t)}</div>${mini}</div>
       <button class="star${starred ? ' on' : ''}" data-star="${escapeHtml(channel.number)}" aria-label="${t(starred ? 'star.remove' : 'star.add')}">${icon(starred ? 'star' : 'star-outline')}</button>

@@ -19,11 +19,12 @@ import { cardTemplate, icon, muteIcon, padHint } from './template.js';
 import { renderApps, renderInputsSheet } from './apps-view.js';
 import { channelListHtml } from './channels-view.js';
 import './editor.js';
-import { attachHold, attachPad, attachPillDrag, attachRepeat, attachStrip, attachSwipe, throttleLatest } from './gestures.js';
+import { attachHold, attachPad, capturePointer, attachPillDrag, attachRepeat, attachStrip, attachSwipe, throttleLatest } from './gestures.js';
 
 /** Tabs that replace the remote area with a scrolling view instead of a fixed panel. */
 const SCROLL_TABS = ['apps'];
 const IME = 'com.webos.service.ime';
+const SHEET_IDS = { channels: 'channels-sheet', numpad: 'numpad-sheet', inputs: 'inputs-sheet' };
 const POWER_BUTTON_GRACE_MS = 800; // ignore the click that follows a completed power-off hold
 
 class LgTvRemoteCard extends HTMLElement {
@@ -155,6 +156,7 @@ class LgTvRemoteCard extends HTMLElement {
     this._root.addEventListener('click', (event) => this._onClick(event));
     ui.text.addEventListener('input', () => this._scheduleTextSync());
     ui.text.addEventListener('keydown', (event) => this._onTextKey(event));
+    this._root.addEventListener('keydown', (event) => this._onEscape(event));
     ui.backdrop.addEventListener('click', () => this._closeSheet());
     ui.popScrim.addEventListener('click', () => this._closePop());
     for (const pop of [ui.popVolume, ui.popChannel]) pop.addEventListener('pointerdown', () => this._armPopTimer());
@@ -225,6 +227,7 @@ class LgTvRemoteCard extends HTMLElement {
     const muted = Boolean(attributes.is_volume_muted);
     ui.mute.classList.toggle('alert', muted);
     ui.mute.innerHTML = muteIcon(muted);
+    ui.mute.setAttribute('aria-pressed', String(muted));
     this._renderVolume(attributes.volume_level, muted);
 
     ui.strip.classList.toggle('available', this._hasPointer);
@@ -336,7 +339,10 @@ class LgTvRemoteCard extends HTMLElement {
     const previous = this._tab;
     this._tab = tab;
     const showScrollView = SCROLL_TABS.includes(tab);
-    this._root.querySelectorAll('[data-tab]').forEach((node) => node.classList.toggle('selected', node.dataset.tab === tab));
+    this._root.querySelectorAll('[data-tab]').forEach((node) => {
+      node.classList.toggle('selected', node.dataset.tab === tab);
+      node.setAttribute('aria-selected', String(node.dataset.tab === tab));
+    });
     this._ui.body.dataset.activeTab = tab;
     this._placeTabPill();
     this._root.querySelectorAll('[data-panel]').forEach((node) => node.classList.toggle('active', node.dataset.panel === tab));
@@ -508,9 +514,14 @@ class LgTvRemoteCard extends HTMLElement {
     this._closeSheet();
   }
 
+  _onEscape(event) {
+    if (event.key !== 'Escape') return;
+    if (this._sheet) this._closeSheet();
+    else if (this._pop) this._closePop();
+  }
+
   _onTextKey(event) {
     if (event.key === 'Enter') this._pressEnterKey();
-    else if (event.key === 'Escape') this._closeSheet();
   }
 
   // ---- Keyboard sheet -----------------------------------------------------
@@ -563,6 +574,7 @@ class LgTvRemoteCard extends HTMLElement {
     card.style.setProperty('--pop-origin', `${buttonBox.left + buttonBox.width / 2 - popLeft}px 100%`);
     card.dataset.pop = name;
     button.classList.add('active');
+    button.setAttribute('aria-expanded', 'true');
     this._armPopTimer();
   }
 
@@ -572,6 +584,8 @@ class LgTvRemoteCard extends HTMLElement {
     delete this._ui.card.dataset.pop;
     this._ui.dockVolume.classList.remove('active');
     this._ui.dockChannel.classList.remove('active');
+    this._ui.dockVolume.setAttribute('aria-expanded', 'false');
+    this._ui.dockChannel.setAttribute('aria-expanded', 'false');
     clearTimeout(this._popTimer);
   }
 
@@ -593,7 +607,7 @@ class LgTvRemoteCard extends HTMLElement {
       this._armPopTimer();
     };
     this._volumeSetter = throttleLatest((level) => this._mediaPlayer('volume_set', { volume_level: Math.round(level * 100) / 100 }), VOLUME_SET_MS);
-    vpill.addEventListener('pointerdown', (event) => { vpill.setPointerCapture(event.pointerId); setFromPointer(event); });
+    vpill.addEventListener('pointerdown', (event) => { capturePointer(vpill, event.pointerId); setFromPointer(event); });
     vpill.addEventListener('pointermove', (event) => { if (vpill.hasPointerCapture(event.pointerId)) setFromPointer(event); });
   }
 
@@ -611,18 +625,29 @@ class LgTvRemoteCard extends HTMLElement {
   _openSheet(name) {
     this._buzz();
     this._closePop();
+    this._opener ??= this._root.activeElement; // focus goes back here on close
     this._sheet = name;
     this._ui.card.dataset.sheet = name;
+    this._setBackgroundInert(true);
     this._placeSheets();
+    if (name !== 'keyboard') this._root.getElementById(SHEET_IDS[name])?.focus({ preventScroll: true }); // keyboard sheet focuses its field below
     if (name === 'keyboard') this._ui.text.focus(); // inside the tap handler, so the phone keyboard opens right away
     if (name === 'channels') this._onChannelsOpened();
     if (name === 'numpad') this._onNumpadOpened();
     if (name === 'inputs') this._renderSources(this._stateObj?.attributes.source_list ?? [], this._stateObj?.attributes.source);
   }
 
+  /** While a sheet is open the rest of the card must not be reachable by keyboard or screen reader. */
+  _setBackgroundInert(on) {
+    this._root.querySelectorAll('ha-card > :not(.panel-sheet):not(.kb-sheet):not(.kb-backdrop)').forEach((node) => { node.inert = on; });
+  }
+
   _closeSheet() {
+    const wasOpen = this._sheet;
     this._sheet = null;
     delete this._ui.card.dataset.sheet;
+    this._setBackgroundInert(false);
+    if (wasOpen) { this._opener?.focus?.({ preventScroll: true }); this._opener = null; }
     this._ui.text.blur();
     this._ui.channelSearch.blur();
     this._cancelNumberTimer();

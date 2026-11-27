@@ -60,6 +60,11 @@ export function throttleLatest(send, intervalMs) {
   };
 }
 
+/** Keeps receiving a pointer's events; synthetic or already released pointers cannot be captured, which is fine. */
+export function capturePointer(element, pointerId) {
+  try { element.setPointerCapture(pointerId); } catch (error) { /* nothing to capture */ }
+}
+
 /** Pressing and holding a button repeats `press(name)`: used for volume and channel. */
 export function attachRepeat(buttons, press) {
   buttons.forEach((button) => {
@@ -73,6 +78,10 @@ export function attachRepeat(buttons, press) {
       delayTimer = setTimeout(() => { repeatTimer = setInterval(() => press(name), REPEAT.intervalMs); }, REPEAT.delayMs);
     });
     RELEASE_EVENTS.forEach((type) => button.addEventListener(type, stop));
+    button.addEventListener('keydown', (event) => { // keyboard and screen readers: one press per Enter/Space
+      if ((event.key === 'Enter' || event.key === ' ') && !event.repeat) { event.preventDefault(); press(button.dataset.repeat); }
+    });
+    button.addEventListener('contextmenu', (event) => event.preventDefault()); // long-press must not open the browser menu
   });
 }
 
@@ -115,7 +124,7 @@ export function attachPad(pad, host) {
   };
 
   pad.addEventListener('pointerdown', (event) => {
-    pad.setPointerCapture(event.pointerId);
+    capturePointer(pad, event.pointerId);
     batcher.reset();
     dragging = host.hasPointer() && Date.now() - lastTapAt < POINTER.doubleTapMs;
     if (dragging) host.buzz();
@@ -167,7 +176,7 @@ export function attachStrip(strip, { gain, send }) {
   const batcher = createBatcher((_dx, dy) => send(dy), SCROLL.tickMs);
 
   strip.addEventListener('pointerdown', (event) => {
-    strip.setPointerCapture(event.pointerId);
+    capturePointer(strip, event.pointerId);
     activeId = event.pointerId;
     lastY = event.clientY;
     batcher.reset();
@@ -231,7 +240,7 @@ export function attachPillDrag(tabs, pill, host) {
     if (!drag.moving) {
       if (Math.abs(event.clientX - drag.startX) < DRAG_START_PX) return;
       drag.moving = true;
-      try { tabs.setPointerCapture(event.pointerId); } catch (error) { /* synthetic or already released pointer */ }
+      capturePointer(tabs, event.pointerId);
       host.start();
     }
     host.move(event.clientX - tabs.getBoundingClientRect().left);

@@ -52,7 +52,7 @@ const sheetHead = (t, title, extra = '') => `
   <div class="sheet-head"><b>${title}</b>${extra}${key(icon('close'), { action: 'close-sheet', label: t('label.close') })}</div>`;
 
 const keyboardSheet = (t) => `
-  <div class="kb-sheet" id="kb-sheet" role="dialog" aria-label="${t('label.keyboard')}">
+  <div class="kb-sheet" id="kb-sheet" role="dialog" aria-modal="true" aria-label="${t('label.keyboard')}">
     <div class="sheet-grip"></div>
     <div class="line">
       <input type="text" id="text" placeholder="${t('kb.placeholder')}" autocomplete="off" autocapitalize="sentences" enterkeyhint="send">
@@ -67,7 +67,7 @@ const keyboardSheet = (t) => `
   </div>`;
 
 const channelsSheet = (t) => `
-  <div class="panel-sheet" id="channels-sheet" role="dialog" aria-label="${t('label.channels')}">
+  <div class="panel-sheet" id="channels-sheet" role="dialog" aria-modal="true" tabindex="-1" aria-label="${t('label.channels')}">
     ${sheetHead(t, t('label.channels'), key(icon('dialpad'), { action: 'open-numpad', label: t('label.typeNumber') }))}
     <label class="search">${icon('magnify')}<input type="search" id="channel-search" placeholder="${t('search.placeholder')}" autocomplete="off" enterkeyhint="search"></label>
     <div class="sheet-scroll" id="channel-list"></div>
@@ -76,7 +76,7 @@ const channelsSheet = (t) => `
 const numpadSheet = (t) => {
   const digit = (n) => `<button class="key" data-digit="${n}">${n}</button>`;
   return `
-  <div class="panel-sheet" id="numpad-sheet" role="dialog" aria-label="${t('label.channelNumber')}">
+  <div class="panel-sheet" id="numpad-sheet" role="dialog" aria-modal="true" tabindex="-1" aria-label="${t('label.channelNumber')}">
     ${sheetHead(t, t('label.channelNumber'))}
     <div class="num-display" id="num-display" role="button" aria-label="${t('label.goToChannel')}"><span class="num-ring" id="num-ring"></span><b id="num-value"></b><span id="num-name"></span></div>
     <div class="num-keys">
@@ -87,7 +87,7 @@ const numpadSheet = (t) => {
 };
 
 const inputsSheet = (t) => `
-  <div class="panel-sheet" id="inputs-sheet" role="dialog" aria-label="${t('label.inputsAndApps')}">
+  <div class="panel-sheet" id="inputs-sheet" role="dialog" aria-modal="true" tabindex="-1" aria-label="${t('label.inputsAndApps')}">
     ${sheetHead(t, t('label.inputsAndApps'))}
     <div class="sheet-scroll" id="inputs-body"></div>
   </div>`;
@@ -122,7 +122,7 @@ const TAB_BUTTONS = [
 ];
 
 export function cardTemplate(t) {
-  const tabBar = TAB_BUTTONS.map((tab) => `<button class="tab" data-tab="${tab.tab}" aria-label="${t(`tab.${tab.tab}`)}">${tabIcon(tab.icon)}<span class="tab-label">${t(`tab.${tab.tab}`)}</span></button>`).join('');
+  const tabBar = TAB_BUTTONS.map((tab) => `<button class="tab" role="tab" aria-selected="false" data-tab="${tab.tab}" aria-label="${t(`tab.${tab.tab}`)}">${tabIcon(tab.icon)}<span class="tab-label">${t(`tab.${tab.tab}`)}</span></button>`).join('');
   return `
 <ha-card>
   <div class="kb-backdrop" id="kb-backdrop"></div>
@@ -130,7 +130,7 @@ export function cardTemplate(t) {
     <button class="key power" id="power" aria-label="${t('label.power')}">${icon('power')}</button>
     <div class="info"><div class="title" id="name"></div><div class="status" id="status"></div></div>
     <button class="key" data-action="open-inputs" aria-label="${t('label.inputsAndApps')}" data-group="controls">${icon('video-input-hdmi')}</button>
-    <button class="key" id="mute" data-action="mute" aria-label="${t('label.mute')}"></button>
+    <button class="key" id="mute" data-action="mute" aria-pressed="false" aria-label="${t('label.mute')}"></button>
   </div>
 
   <div class="now" id="now" data-mode="live" data-group="controls">
@@ -172,10 +172,10 @@ export function cardTemplate(t) {
     ${key(icon('keyboard-backspace'), { button: 'BACK', label: t('label.back') })}
     ${key(icon('home'), { button: 'HOME', label: t('label.home') })}
     ${key(icon('keyboard-outline'), { action: 'open-keyboard', label: t('label.keyboard') })}
-    <button class="key" data-action="toggle-volume" id="dock-volume" aria-label="${t('label.volume')}">${icon('volume-high')}</button>
-    <button class="key" data-action="toggle-channel" id="dock-channel" aria-label="${t('label.channels')}">${icon('television-guide')}</button>
+    <button class="key" data-action="toggle-volume" id="dock-volume" aria-expanded="false" aria-label="${t('label.volume')}">${icon('volume-high')}</button>
+    <button class="key" data-action="toggle-channel" id="dock-channel" aria-expanded="false" aria-label="${t('label.channels')}">${icon('television-guide')}</button>
   </div>
-  <div class="tabs" id="tabs" data-group="controls"><span class="tab-pill" id="tab-pill"><i class="blob" id="tab-blob"></i></span>${tabBar}</div>
+  <div class="tabs" id="tabs" role="tablist" data-group="controls"><span class="tab-pill" id="tab-pill"><i class="blob" id="tab-blob"></i></span>${tabBar}</div>
   ${popovers(t)}
   ${keyboardSheet(t)}${channelsSheet(t)}${numpadSheet(t)}${inputsSheet(t)}
 </ha-card>`;

@@ -49,7 +49,7 @@ const html = `${page}<style>@font-face{font-family:'Material Design Icons';src:u
 const url = 'https://mrgiov.github.io/lg-tv-remote-card/';
 const title = 'LG TV Remote Card: online demo / telecomando LG per Home Assistant';
 const about = 'Try the Home Assistant Lovelace card for LG webOS TVs in your browser: magic-remote touchpad, channels, apps, keyboard. Provala nel browser: telecomando LG webOS per Home Assistant.';
-const head = `<!doctype html><html lang="it"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+const head = `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="${about}"><link rel="canonical" href="${url}">
 <meta property="og:type" content="website"><meta property="og:title" content="${title}"><meta property="og:description" content="${about}">
 <meta property="og:url" content="${url}"><meta property="og:image" content="${url}screenshot.png">

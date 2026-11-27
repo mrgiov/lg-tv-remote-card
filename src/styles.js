@@ -13,7 +13,8 @@ export const STYLES = /* css */ `
     background:radial-gradient(90% 50% at 15% 0%, var(--tint), transparent 70%), radial-gradient(80% 45% at 100% 100%, #5b21b6, transparent 70%), #0b0e14;
     touch-action:pan-y; user-select:none; -webkit-user-select:none; -webkit-tap-highlight-color:transparent;
   }
-  button { font-family:inherit; color:inherit; touch-action:manipulation; }
+  button { font-family:inherit; color:inherit; touch-action:manipulation; -webkit-touch-callout:none; }
+  .panel-sheet:focus { outline:none; }
   ha-icon { --mdc-icon-size:22px; display:inline-flex; }
 
   /* glass surfaces */
@@ -26,7 +27,7 @@ export const STYLES = /* css */ `
     font-size:16px; font-weight:600; cursor:pointer;
   }
   .key:active, .tile:active, .ch-row:active, .chip:active { filter:brightness(1.35); transform:scale(.97); }
-  .key.primary { background:linear-gradient(160deg, #6cb8ff, #2f7fe0); }
+  .key.primary { background:linear-gradient(160deg, #2f6fd8, #1b52b0); }
   .key.alert { background:linear-gradient(160deg, #ff6b61, #d92b20); }
   .key:focus-visible, .tab:focus-visible, .ch-row:focus-visible, .tile:focus-visible { outline:2px solid #fff; outline-offset:2px; }
 
@@ -107,7 +108,7 @@ export const STYLES = /* css */ `
   /* dock and tabs */
   .dock { display:grid; grid-template-columns:repeat(5,1fr); gap:6px; flex:none; }
   .dock .key { min-height:50px; border-radius:22px; }
-  .dock .key.active { background:linear-gradient(160deg, #6cb8ff, #2f7fe0); }
+  .dock .key.active { background:linear-gradient(160deg, #2f6fd8, #1b52b0); }
   .tabs { --ease:cubic-bezier(.25,.8,.25,1); position:relative; display:flex; gap:${TAB_BAR.gap}px; padding:${TAB_BAR.padding}px; border-radius:26px; flex:none; }
   .tab-pill {
     position:absolute; top:${TAB_BAR.padding}px; bottom:${TAB_BAR.padding}px; left:0; width:0; pointer-events:none; will-change:transform, width;
@@ -153,11 +154,11 @@ export const STYLES = /* css */ `
   .tile.current .icon { box-shadow:0 0 0 2px #fff, 0 4px 12px rgba(0,0,0,.3); }
   .chips { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:6px; }
   .chip { min-height:40px; padding:0 14px; border-radius:20px; font-size:13px; font-weight:600; cursor:pointer; }
-  .chip.current { background:linear-gradient(160deg, #6cb8ff, #2f7fe0); }
+  .chip.current { background:linear-gradient(160deg, #2f6fd8, #1b52b0); }
   .chips.collapsed { display:none; }
 
   /* bottom sheets: one at a time, lined up with the card and above the phone keyboard */
-  .kb-backdrop { position:fixed; inset:0; z-index:20; background:rgba(3,6,12,.5); backdrop-filter:blur(4px); opacity:0; pointer-events:none; transition:opacity .2s; }
+  .kb-backdrop { position:fixed; inset:0; z-index:20; background:rgba(3,6,12,.5); opacity:0; pointer-events:none; transition:opacity .2s; }
   ha-card[data-sheet] .kb-backdrop { opacity:1; pointer-events:auto; }
   .panel-sheet, .kb-sheet {
     position:fixed; left:var(--kb-left,0px); width:var(--kb-width,100%); bottom:var(--kb-inset,0px); z-index:21; box-sizing:border-box;
@@ -264,4 +265,8 @@ export const STYLES = /* css */ `
   @keyframes from-left { from { opacity:0; transform:translateX(-24px); } to { opacity:1; transform:none; } }
   .slide-forward { animation:from-right .18s ease-out; }
   .slide-back { animation:from-left .18s ease-out; }
+  @media (prefers-reduced-motion: reduce) {
+    .slide-forward, .slide-back, .num-display.bad, .power-big.busy { animation:none; }
+    .panel-sheet, .kb-sheet, .kb-backdrop, .pop, .toast, .sheet, .vfill { transition:none !important; }
+  }
 `;
